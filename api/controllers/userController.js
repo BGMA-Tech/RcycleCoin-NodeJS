@@ -16,10 +16,8 @@ exports.userRegister = (req, res, next) => {
       if (user.length >= 1) {
         return Utils.errorResponse(res, 409, 'Mail exists');
       }
-      bcrypt.hash(req.body.password, 10, (err, hash) => {
-        if (err) {
-          return Utils.errorResponse(res, 500, err);
-        }
+      bcrypt.hash(req.body.password, 10, async (err, hash) => {
+        if (err) return Utils.errorResponse(res, 500, err);
 
         const personelId = hashUtil.createHash(req.body.email + hash);
 
@@ -46,18 +44,30 @@ exports.userRegister = (req, res, next) => {
           info: info._id,
           coin: coin._id,
         });
-
-        user
-          .save()
-          .then((result) => {
-            Utils.successResponse(res, 201, {
-              message: 'User created',
-              result,
-            });
-          })
-          .catch((err) => {
-            Utils.errorResponse(res, 500, err);
+        try {
+          await coin.save();
+          await info.save();
+          await user.save();
+          return Utils.successResponse(res, 201, {
+            message: 'User created',
+            user: {
+              _id: user._id,
+              email: user.email,
+              info: {
+                firstname: info.firstname,
+                lastname: info.lastname,
+                createdAt: info.createdAt,
+                role: info.role,
+                image: info.image,
+              },
+              coin: {
+                coin: coin.coin,
+              },
+            },
           });
+        } catch (error) {
+          return Utils.errorResponse(res, 500, error);
+        }
       });
     });
 };
