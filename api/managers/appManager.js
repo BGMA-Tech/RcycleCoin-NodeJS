@@ -7,6 +7,7 @@ const AppManager = {
     console.log('AppManager.init()');
     app.use(cors());
     app.use(morgan('dev'));
+    app.use('/uploads', express.static('uploads'));
     app.use(bodyParser.urlencoded({ extended: false }));
     app.use(bodyParser.json());
   },

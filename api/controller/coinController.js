@@ -1,6 +1,6 @@
 const mongoose = require('mongoose');
 const Coin = require('../models/coin');
-const Utils = require('../utils');
+const Utils = require('../utils/response');
 
 exports.coinGetOne = (req, res, next) => {
   const id = req.params.id;
