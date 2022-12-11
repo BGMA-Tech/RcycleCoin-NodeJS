@@ -89,22 +89,4 @@ exports.transactionCreate = async (req, res, next) => {
       }
     }
   });
-
-  // transaction
-  //   .save()
-  //   .then((result) => {
-  //     Utils.successResponse(res, 201, {
-  //       message: 'Transaction stored',
-  //       createdTransaction: {
-  //         _id: result._id,
-  //         fromPersonelId: result.fromPersonelId,
-  //         toPersonelId: result.toPersonelId,
-  //         coinAmount: result.coinAmount,
-  //         createdAt: result.createdAt,
-  //       },
-  //     });
-  //   })
-  //   .catch((err) => {
-  //     Utils.errorResponse(res, 500, err);
-  //   });
 };
