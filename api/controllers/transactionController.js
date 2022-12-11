@@ -27,7 +27,7 @@ exports.transactionGetAll = (req, res, next) => {
 };
 
 exports.transactionGetAllById = (req, res, next) => {
-  const id = req.params.transactionId;
+  const id = req.params.id;
   Transaction.findById(id)
     .select('_id fromPersonelId toPersonelId coinAmount createdAt')
     .exec()
