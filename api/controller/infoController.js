@@ -1,6 +1,6 @@
 const mongoose = require('mongoose');
 const Info = require('../models/info');
-const Utils = require('../utils');
+const Utils = require('../utils/response');
 
 exports.infoGetOne = (req, res, next) => {
   const id = req.params.id;
