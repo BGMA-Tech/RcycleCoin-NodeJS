@@ -1,11 +1,11 @@
 const mongoose = require('mongoose');
-const Coin = require('../models/coin');
+const Info = require('../models/info');
 const Utils = require('../utils');
 
-exports.coinGetOne = (req, res, next) => {
+exports.infoGetOne = (req, res, next) => {
   const id = req.params.id;
-  Coin.find({ _id: id })
-    .select('_id personelId totalCoin')
+  Info.find({ _id: id })
+    .select('_id firstname lastname createdAt role image')
     .exec()
     .then((doc) => {
       if (doc) {
@@ -19,13 +19,15 @@ exports.coinGetOne = (req, res, next) => {
     });
 };
 
-exports.coinCreate = (req, res, next) => {
-  const coin = new Coin({
+exports.infoCreate = (req, res, next) => {
+  const info = new Info({
     _id: new mongoose.Types.ObjectId(),
-    personelId: req.body.personelId,
-    totalCoin: 0,
+    firstname: req.body.firstname,
+    lastname: req.body.lastname,
+    role: req.body.role,
+    image: req.body.image,
   });
-  coin
+  info
     .save()
     .then((result) => {
       Utils.successResponse(res, 201, result);
@@ -35,25 +37,13 @@ exports.coinCreate = (req, res, next) => {
     });
 };
 
-exports.coinUpdate = (req, res, next) => {
-  const id = req.params.coinId;
+exports.infoUpdate = (req, res, next) => {
+  const id = req.params.infoId;
   const updateOps = {};
   for (const ops of req.body) {
     updateOps[ops.propName] = ops.value;
   }
-  Coin.updateOne({ _id: id }, { $set: updateOps })
-    .exec()
-    .then((result) => {
-      Utils.successResponse(res, 200, result);
-    })
-    .catch((err) => {
-      Utils.errorResponse(res, 500, err);
-    });
-};
-
-exports.coinDelete = (req, res, next) => {
-  const id = req.params.coinId;
-  Coin.findByIdAndRemove(id)
+  Info.updateOne({ _id: id }, { $set: updateOps })
     .exec()
     .then((result) => {
       Utils.successResponse(res, 200, result);
