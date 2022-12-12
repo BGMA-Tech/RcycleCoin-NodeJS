@@ -11,13 +11,7 @@ exports.transactionGetAll = (req, res, next) => {
     .then((docs) => {
       const response = {
         count: docs.length,
-        transactions: docs.map((doc) => {
-          return {
-            _id: doc._id,
-            product: doc.product,
-            quantity: doc.quantity,
-          };
-        }),
+        transactions: docs,
       };
       Utils.successResponse(res, 200, response);
     })
@@ -45,7 +39,7 @@ exports.transactionGetAllById = (req, res, next) => {
     });
 };
 
-exports.transactionCreate = async (req, res, next) => {
+exports.transactionCreate = (req, res, next) => {
   const fromCoin = Coin.findOne({ personelId: req.body.fromPersonelId });
   const toCoin = Coin.findOne({ personelId: req.body.toPersonelId });
 
@@ -57,17 +51,17 @@ exports.transactionCreate = async (req, res, next) => {
     createdAt: Date.now(),
   });
 
-  await Promise.all([fromCoin, toCoin]).then(async (values) => {
+  Promise.all([fromCoin, toCoin]).then(async (values) => {
     const fromCoin = values[0];
     const toCoin = values[1];
 
-    if (fromCoin.coinAmount < transaction.coinAmount) {
+    if (fromCoin.totalCoin < transaction.coinAmount) {
       return Utils.errorResponse(res, 500, {
         message: 'Not enough coin to transfer',
       });
     } else {
-      fromCoin.coinAmount -= transaction.coinAmount;
-      toCoin.coinAmount += transaction.coinAmount;
+      fromCoin.totalCoin -= transaction.coinAmount;
+      toCoin.totalCoin += transaction.coinAmount;
 
       try {
         await fromCoin.save();
