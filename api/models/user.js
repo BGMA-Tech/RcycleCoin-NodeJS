@@ -13,3 +13,5 @@ const UserSchema = new mongoose.Schema({
   coin: { type: mongoose.Schema.Types.ObjectId, ref: 'Coin', required: true },
   info: { type: mongoose.Schema.Types.ObjectId, ref: 'Info', required: true },
 });
+
+module.exports = mongoose.model('User', UserSchema);
