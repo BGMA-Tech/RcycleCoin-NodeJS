@@ -4,7 +4,7 @@ const Utils = require('../utils/response');
 
 exports.coinGetOne = (req, res, next) => {
   const id = req.params.id;
-  Coin.find({ _id: id })
+  Coin.findOne({ _id: id })
     .select('_id personelId totalCoin')
     .exec()
     .then((doc) => {
