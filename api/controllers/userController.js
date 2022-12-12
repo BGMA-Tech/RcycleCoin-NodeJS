@@ -1,13 +1,15 @@
 const mongoose = require('mongoose');
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
-const User = require('../models/user');
-const crypto = require('crypto');
 
 const Utils = require('../utils/response');
 const hashUtil = require('../utils/hash/hashUtil');
 
-const basePath = `http://localhost:${process.env.PORT ?? 3000}/products`;
+const User = require('../models/user');
+const Coin = require('../models/coin');
+const Info = require('../models/info');
+
+const basePath = `http://localhost:${process.env.PORT ?? 3000}`;
 
 exports.userRegister = (req, res, next) => {
   User.find({ email: req.body.email })
@@ -24,7 +26,7 @@ exports.userRegister = (req, res, next) => {
         const coin = new Coin({
           _id: new mongoose.Types.ObjectId(),
           personelId: personelId,
-          coin: 0,
+          totalCoin: 0,
         });
 
         const info = new Info({
@@ -49,20 +51,18 @@ exports.userRegister = (req, res, next) => {
           await info.save();
           await user.save();
           return Utils.successResponse(res, 201, {
-            message: 'User created',
-            user: {
-              _id: user._id,
-              email: user.email,
-              info: {
-                firstname: info.firstname,
-                lastname: info.lastname,
-                createdAt: info.createdAt,
-                role: info.role,
-                image: info.image,
-              },
-              coin: {
-                coin: coin.coin,
-              },
+            _id: user._id,
+            email: user.email,
+            info: {
+              firstname: info.firstname,
+              lastname: info.lastname,
+              createdAt: info.createdAt,
+              role: info.role,
+              image: info.image,
+            },
+            coin: {
+              totalCoin: coin.totalCoin,
+              personelId: coin.personelId,
             },
           });
         } catch (error) {
@@ -104,5 +104,23 @@ exports.userLogin = (req, res, next) => {
     })
     .catch((err) => {
       Utils.errorResponse(res, 500, err);
+    });
+};
+
+exports.getUserById = (req, res, next) => {
+  const id = req.params.id;
+  User.findOne({ _id: id })
+    .select('_id personelId email info coin')
+    .populate('info')
+    .populate('coin')
+    .exec()
+    .then((user) => {
+      if (user) {
+        return Utils.successResponse(res, 200, user);
+      }
+      return Utils.errorResponse(res, 404, 'User not found');
+    })
+    .catch((err) => {
+      return Utils.errorResponse(res, 500, err);
     });
 };

@@ -1,5 +1,4 @@
 require('dotenv/config');
-
 const express = require('express');
 const app = express();
 
@@ -9,8 +8,9 @@ const routes = require('./api/routes');
 
 managers.mongooseManager.init();
 managers.appManager.init(app);
-
 app.use('/coin', routes.coinRoutes);
+app.use('/info', routes.infoRoutes);
+app.use('/user', routes.userRoutes);
 
 app.get('/', (req, res) => {
   return res.json({
