@@ -1,0 +1,18 @@
+syntax = "proto3";
+
+package verifyIDPackage;
+
+service VerifyID {
+  rpc verifyId(RequestParam) returns (ResponseParam);
+}
+
+message RequestParam {
+  string idNumber = 1;
+  string name = 2;
+  string lastName = 3;
+  int32 birthdayYear = 4;
+}
+
+message ResponseParam {
+  bool isVerified = 1;
+}
