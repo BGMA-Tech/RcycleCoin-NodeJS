@@ -50,21 +50,26 @@ exports.userRegister = (req, res, next) => {
           await coin.save();
           await info.save();
           await user.save();
-          return Utils.successResponse(res, 201, {
-            _id: user._id,
-            email: user.email,
-            info: {
-              firstname: info.firstname,
-              lastname: info.lastname,
-              createdAt: info.createdAt,
-              role: info.role,
-              image: info.image,
+          return Utils.successResponse(
+            res,
+            201,
+            {
+              _id: user._id,
+              email: user.email,
+              info: {
+                firstname: info.firstname,
+                lastname: info.lastname,
+                createdAt: info.createdAt,
+                role: info.role,
+                image: info.image,
+              },
+              coin: {
+                totalCoin: coin.totalCoin,
+                personelId: coin.personelId,
+              },
             },
-            coin: {
-              totalCoin: coin.totalCoin,
-              personelId: coin.personelId,
-            },
-          });
+            'User created successfully'
+          );
         } catch (error) {
           return Utils.errorResponse(res, 500, error);
         }
@@ -94,10 +99,7 @@ exports.userLogin = (req, res, next) => {
               expiresIn: '1h',
             }
           );
-          return Utils.successResponse(res, 200, {
-            message: 'Auth successful',
-            token,
-          });
+          return Utils.successResponse(res, 200, token, 'Auth successful');
         }
         return Utils.errorResponse(res, 401, 'Auth failed');
       });
@@ -116,7 +118,7 @@ exports.getUserById = (req, res, next) => {
     .exec()
     .then((user) => {
       if (user) {
-        return Utils.successResponse(res, 200, user);
+        return Utils.successResponse(res, 200, user, 'User found');
       }
       return Utils.errorResponse(res, 404, 'User not found');
     })
