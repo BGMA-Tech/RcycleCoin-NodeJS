@@ -11,7 +11,7 @@ exports.infoGetOne = (req, res, next) => {
     .exec()
     .then((doc) => {
       if (doc) {
-        Utils.successResponse(res, 200, doc);
+        Utils.successResponse(res, 200, doc, 'Info found successfully');
       } else {
         Utils.errorResponse(res, 404, 'No valid entry found for provided ID');
       }
@@ -33,13 +33,18 @@ exports.infoCreate = (req, res, next) => {
   info
     .save()
     .then((result) => {
-      Utils.successResponse(res, 201, {
-        _id: result._id,
-        firstname: result.firstname,
-        lastname: result.lastname,
-        role: result.role,
-        image: result.image,
-      });
+      Utils.successResponse(
+        res,
+        201,
+        {
+          _id: result._id,
+          firstname: result.firstname,
+          lastname: result.lastname,
+          role: result.role,
+          image: result.image,
+        },
+        'Info created successfully'
+      );
     })
     .catch((err) => {
       Utils.errorResponse(res, 500, err);
@@ -57,7 +62,7 @@ exports.infoUpdate = (req, res, next) => {
   Info.updateOne({ _id: id }, { $set: updateOps })
     .exec()
     .then((result) => {
-      Utils.successResponse(res, 200, result);
+      Utils.successResponse(res, 200, result, 'Info updated successfully');
     })
     .catch((err) => {
       Utils.errorResponse(res, 500, err);

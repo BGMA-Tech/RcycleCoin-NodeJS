@@ -9,7 +9,7 @@ exports.coinGetOne = (req, res, next) => {
     .exec()
     .then((doc) => {
       if (doc) {
-        return Utils.successResponse(res, 200, doc);
+        return Utils.successResponse(res, 200, doc, 'Coin found successfully');
       } else {
         return Utils.errorResponse(
           res,
@@ -34,7 +34,12 @@ exports.coinUpdate = (req, res, next) => {
   Coin.updateOne({ _id: id }, { $set: updateOps })
     .exec()
     .then((result) => {
-      return Utils.successResponse(res, 200, result);
+      return Utils.successResponse(
+        res,
+        200,
+        result,
+        'Coin updated successfully'
+      );
     })
     .catch((err) => {
       return Utils.errorResponse(res, 500, err);
@@ -46,7 +51,12 @@ exports.coinDelete = (req, res, next) => {
   Coin.findByIdAndRemove(id)
     .exec()
     .then((result) => {
-      return Utils.successResponse(res, 200, result);
+      return Utils.successResponse(
+        res,
+        200,
+        result,
+        'Coin deleted successfully'
+      );
     })
     .catch((err) => {
       return Utils.errorResponse(res, 500, err);

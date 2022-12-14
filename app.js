@@ -1,4 +1,3 @@
-require('dotenv/config');
 const express = require('express');
 const app = express();
 
@@ -8,7 +7,6 @@ const routes = require('./api/routes/routes');
 
 managers.mongooseManager.init();
 managers.appManager.init(app);
-
 app.use(routes.default);
 
 app.get('/', (req, res) => {

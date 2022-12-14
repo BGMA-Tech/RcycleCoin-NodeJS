@@ -13,7 +13,12 @@ exports.transactionGetAll = (req, res, next) => {
         count: docs.length,
         transactions: docs,
       };
-      Utils.successResponse(res, 200, response);
+      Utils.successResponse(
+        res,
+        200,
+        response,
+        'Transactions found successfully'
+      );
     })
     .catch((err) => {
       Utils.errorResponse(res, 500, err);
@@ -27,11 +32,9 @@ exports.transactionGetAllById = (req, res, next) => {
     .exec()
     .then((doc) => {
       if (doc) {
-        Utils.successResponse(res, 200, doc);
+        Utils.successResponse(res, 200, doc, 'Transaction found successfully');
       } else {
-        Utils.errorResponse(res, 404, {
-          message: 'No valid entry found for provided ID',
-        });
+        Utils.errorResponse(res, 404, 'No valid entry found for provided ID');
       }
     })
     .catch((err) => {
@@ -68,16 +71,18 @@ exports.transactionCreate = (req, res, next) => {
         await toCoin.save();
         await transaction.save();
 
-        return Utils.successResponse(res, 201, {
-          message: 'Transaction stored',
-          createdTransaction: {
+        return Utils.successResponse(
+          res,
+          201,
+          {
             _id: transaction._id,
             fromPersonelId: transaction.fromPersonelId,
             toPersonelId: transaction.toPersonelId,
             coinAmount: transaction.coinAmount,
             createdAt: transaction.createdAt,
           },
-        });
+          'Transaction created successfully'
+        );
       } catch (error) {
         return Utils.errorResponse(res, 500, error);
       }

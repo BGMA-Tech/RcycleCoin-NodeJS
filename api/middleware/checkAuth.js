@@ -8,8 +8,6 @@ module.exports = (req, res, next) => {
     req.userData = decoded;
     next();
   } catch (error) {
-    return Utils.errorResponse(res, 401, {
-      message: 'Auth failed',
-    });
+    return Utils.errorResponse(res, 401, 'Auth failed');
   }
 };
