@@ -4,7 +4,7 @@ const jwt = require('jsonwebtoken');
 
 const Utils = require('../utils/response');
 const hashUtil = require('../utils/hash/hashUtil');
-
+const GetVerifyId = require('../grpc/grpcClient');
 const User = require('../models/user');
 const Coin = require('../models/coin');
 const Info = require('../models/info');
@@ -125,4 +125,26 @@ exports.getUserById = (req, res, next) => {
     .catch((err) => {
       return Utils.errorResponse(res, 500, err);
     });
+};
+
+exports.verifyIDNumber = (req, res, next) => {
+  const idNumber = req.body.idNumber;
+  const name = req.body.name;
+  const lastName = req.body.lastName;
+  const birthdayYear = req.body.birthdayYear;
+
+  return GetVerifyId(
+    idNumber,
+    name,
+    lastName,
+    birthdayYear,
+    (err, response) => {
+      if (err) {
+        return Utils.errorResponse(res, 500, err);
+      }
+      return Utils.successResponse(res, 200, {
+        isVerified: response,
+      });
+    }
+  );
 };
