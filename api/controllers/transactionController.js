@@ -29,9 +29,7 @@ exports.transactionGetAllById = (req, res, next) => {
       if (doc) {
         Utils.successResponse(res, 200, doc);
       } else {
-        Utils.errorResponse(res, 404, {
-          message: 'No valid entry found for provided ID',
-        });
+        Utils.errorResponse(res, 404, 'No valid entry found for provided ID');
       }
     })
     .catch((err) => {
@@ -39,20 +37,10 @@ exports.transactionGetAllById = (req, res, next) => {
     });
 };
 
-exports.transactionCreate = (req, res, next) => {
-  const fromCoin = Coin.findOne({ personelId: req.body.fromPersonelId })
-    .exec()
-    .then((coin) => {})
-    .catch((err) => {
-      return Utils.errorResponse(res, 500, err);
-    });
-
-  const toCoin = Coin.findOne({ personelId: req.body.toPersonelId })
-    .exec()
-    .then((coin) => {})
-    .catch((err) => {
-      return Utils.errorResponse(res, 500, err);
-    });
+exports.transactionCreate = async (req, res, next) => {
+  const fromCoin = await Coin.findOne({ personelId: req.body.fromPersonelId });
+  console.log('fromCoin', fromCoin);
+  const toCoin = await Coin.findOne({ personelId: req.body.toPersonelId });
 
   const transaction = new Transaction({
     _id: new mongoose.Types.ObjectId(),
@@ -62,36 +50,29 @@ exports.transactionCreate = (req, res, next) => {
     createdAt: Date.now(),
   });
 
-  Promise.all([fromCoin, toCoin]).then(async (values) => {
-    const fromCoin = values[0];
-    const toCoin = values[1];
+  if (fromCoin.totalCoin < transaction.coinAmount) {
+    return Utils.errorResponse(res, 500, 'Not enough coin to transfer');
+  } else {
+    fromCoin.totalCoin -= transaction.coinAmount;
+    toCoin.totalCoin += transaction.coinAmount;
 
-    if (fromCoin.totalCoin < transaction.coinAmount) {
-      return Utils.errorResponse(res, 500, {
-        message: 'Not enough coin to transfer',
+    try {
+      await fromCoin.save();
+      await toCoin.save();
+      await transaction.save();
+
+      return Utils.successResponse(res, 201, {
+        message: 'Transaction stored',
+        createdTransaction: {
+          _id: transaction._id,
+          fromPersonelId: transaction.fromPersonelId,
+          toPersonelId: transaction.toPersonelId,
+          coinAmount: transaction.coinAmount,
+          createdAt: transaction.createdAt,
+        },
       });
-    } else {
-      fromCoin.totalCoin -= transaction.coinAmount;
-      toCoin.totalCoin += transaction.coinAmount;
-
-      try {
-        await fromCoin.save();
-        await toCoin.save();
-        await transaction.save();
-
-        return Utils.successResponse(res, 201, {
-          message: 'Transaction stored',
-          createdTransaction: {
-            _id: transaction._id,
-            fromPersonelId: transaction.fromPersonelId,
-            toPersonelId: transaction.toPersonelId,
-            coinAmount: transaction.coinAmount,
-            createdAt: transaction.createdAt,
-          },
-        });
-      } catch (error) {
-        return Utils.errorResponse(res, 500, error);
-      }
+    } catch (error) {
+      return Utils.errorResponse(res, 500, error);
     }
-  });
+  }
 };
