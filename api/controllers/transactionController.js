@@ -40,8 +40,19 @@ exports.transactionGetAllById = (req, res, next) => {
 };
 
 exports.transactionCreate = (req, res, next) => {
-  const fromCoin = Coin.findOne({ personelId: req.body.fromPersonelId });
-  const toCoin = Coin.findOne({ personelId: req.body.toPersonelId });
+  const fromCoin = Coin.findOne({ personelId: req.body.fromPersonelId })
+    .exec()
+    .then((coin) => {})
+    .catch((err) => {
+      return Utils.errorResponse(res, 500, err);
+    });
+
+  const toCoin = Coin.findOne({ personelId: req.body.toPersonelId })
+    .exec()
+    .then((coin) => {})
+    .catch((err) => {
+      return Utils.errorResponse(res, 500, err);
+    });
 
   const transaction = new Transaction({
     _id: new mongoose.Types.ObjectId(),

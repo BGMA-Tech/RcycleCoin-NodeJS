@@ -8,6 +8,6 @@ const upload = GetUploadWithConfig();
 
 router.get('/:id', checkAuth, InfoController.infoGetOne);
 router.post('/', checkAuth, upload.single('image'), InfoController.infoCreate);
-router.patch('/:id', checkAuth, InfoController.infoUpdate);
+router.put('/:id', checkAuth, InfoController.infoUpdate);
 
 module.exports = router;

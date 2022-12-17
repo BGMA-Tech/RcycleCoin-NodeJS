@@ -8,7 +8,13 @@ const GetVerifyId = require('../grpc/grpcClient');
 const User = require('../models/user');
 const Coin = require('../models/coin');
 const Info = require('../models/info');
-
+const {
+  PERSONEL_ID,
+  PERSONEL_ROLE,
+  NAME_IDENTIFIER,
+  ROLE,
+  EMAIL,
+} = require('../utils/constants/.NETConstants');
 const basePath = `http://localhost:${process.env.PORT ?? 3000}`;
 
 exports.userRegister = (req, res, next) => {
@@ -28,13 +34,12 @@ exports.userRegister = (req, res, next) => {
           personelId: personelId,
           totalCoin: 0,
         });
-
         const info = new Info({
           _id: new mongoose.Types.ObjectId(),
           firstname: req.body.firstname,
           lastname: req.body.lastname,
           createdAt: Date.now(),
-          role: 'user',
+          role: PERSONEL_ROLE,
           image: `${basePath}/${req.file.path}`,
         });
 
@@ -54,6 +59,7 @@ exports.userRegister = (req, res, next) => {
             _id: user._id,
             email: user.email,
             info: {
+              _id: info._id,
               firstname: info.firstname,
               lastname: info.lastname,
               createdAt: info.createdAt,
@@ -61,6 +67,7 @@ exports.userRegister = (req, res, next) => {
               image: info.image,
             },
             coin: {
+              _id: coin._id,
               totalCoin: coin.totalCoin,
               personelId: coin.personelId,
             },
@@ -74,6 +81,8 @@ exports.userRegister = (req, res, next) => {
 
 exports.userLogin = (req, res, next) => {
   User.find({ email: req.body.email })
+    .populate('info')
+    .populate('coin')
     .exec()
     .then((user) => {
       if (user.length < 1) {
@@ -84,16 +93,15 @@ exports.userLogin = (req, res, next) => {
           return Utils.errorResponse(res, 401, 'Auth failed');
         }
         if (result) {
-          const token = jwt.sign(
-            {
-              userId: user[0]._id,
-              personelId: user[0].personelId,
-            },
-            process.env.JWT_KEY,
-            {
-              expiresIn: '1h',
-            }
-          );
+          const tokenParameters = {};
+          tokenParameters[NAME_IDENTIFIER] = user[0]._id.toString();
+          tokenParameters[PERSONEL_ID] = user[0].personelId;
+          tokenParameters[EMAIL] = user[0].email;
+          tokenParameters[ROLE] = user[0].info.role;
+
+          const token = jwt.sign(tokenParameters, process.env.JWT_KEY, {
+            expiresIn: '1h',
+          });
           return Utils.successResponse(res, 200, {
             message: 'Auth successful',
             token,
