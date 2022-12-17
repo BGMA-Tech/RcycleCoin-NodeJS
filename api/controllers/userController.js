@@ -148,9 +148,7 @@ exports.verifyIDNumber = (req, res, next) => {
       if (err) {
         return Utils.errorResponse(res, 500, err);
       }
-      return Utils.successResponse(res, 200, {
-        isVerified: response,
-      });
+      return Utils.successResponse(res, 200, response);
     }
   );
 };
