@@ -15,6 +15,7 @@ const {
   ROLE,
   EMAIL,
 } = require('../utils/constants/.NETConstants');
+
 const basePath = `http://localhost:${process.env.PORT ?? 3000}`;
 
 exports.userRegister = (req, res, next) => {
@@ -40,7 +41,7 @@ exports.userRegister = (req, res, next) => {
           lastname: req.body.lastname,
           createdAt: Date.now(),
           role: PERSONEL_ROLE,
-          image: `${basePath}/${req.file.path}`,
+          image: 'default_path', //`${basePath}/${req.file.path}`,
         });
 
         const user = new User({
