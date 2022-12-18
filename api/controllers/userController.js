@@ -59,6 +59,7 @@ exports.userRegister = (req, res, next) => {
           return Utils.successResponse(res, 201, {
             _id: user._id,
             email: user.email,
+            personelId: user.personelId,
             info: {
               _id: info._id,
               firstname: info.firstname,
@@ -106,6 +107,24 @@ exports.userLogin = (req, res, next) => {
           return Utils.successResponse(res, 200, {
             message: 'Auth successful',
             token,
+            user: {
+              _id: user[0]._id,
+              email: user[0].email,
+              personelId: user[0].personelId,
+              info: {
+                _id: user[0].info._id,
+                firstname: user[0].info.firstname,
+                lastname: user[0].info.lastname,
+                createdAt: user[0].info.createdAt,
+                role: user[0].info.role,
+                image: user[0].info.image,
+              },
+              coin: {
+                _id: user[0].coin._id,
+                totalCoin: user[0].coin.totalCoin,
+                personelId: user[0].coin.personelId,
+              },
+            },
           });
         }
         return Utils.errorResponse(res, 401, 'Auth failed');
@@ -120,8 +139,8 @@ exports.getUserById = (req, res, next) => {
   const id = req.params.id;
   User.findOne({ _id: id })
     .select('_id personelId email info coin')
-    .populate('info')
-    .populate('coin')
+    .populate('info', '_id firstname lastname createdAt role image')
+    .populate('coin', '_id totalCoin personelId')
     .exec()
     .then((user) => {
       if (user) {
