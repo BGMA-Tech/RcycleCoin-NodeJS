@@ -9,18 +9,14 @@ exports.transactionGetAll = (req, res, next) => {
     .select('_id fromPersonelId toPersonelId coinAmount createdAt')
     .exec()
     .then((docs) => {
-      const response = {
-        count: docs.length,
-        transactions: docs,
-      };
-      Utils.successResponse(res, 200, response);
+      Utils.successResponse(res, 200, docs);
     })
     .catch((err) => {
       Utils.errorResponse(res, 500, err);
     });
 };
 
-exports.transactionGetAllById = (req, res, next) => {
+exports.transactionGetById = (req, res, next) => {
   const id = req.params.id;
   Transaction.findById(id)
     .select('_id fromPersonelId toPersonelId coinAmount createdAt')
@@ -39,7 +35,7 @@ exports.transactionGetAllById = (req, res, next) => {
 
 exports.transactionCreate = async (req, res, next) => {
   const fromCoin = await Coin.findOne({ personelId: req.body.fromPersonelId });
-  console.log('fromCoin', fromCoin);
+
   const toCoin = await Coin.findOne({ personelId: req.body.toPersonelId });
 
   const transaction = new Transaction({
@@ -62,17 +58,40 @@ exports.transactionCreate = async (req, res, next) => {
       await transaction.save();
 
       return Utils.successResponse(res, 201, {
-        message: 'Transaction stored',
-        createdTransaction: {
-          _id: transaction._id,
-          fromPersonelId: transaction.fromPersonelId,
-          toPersonelId: transaction.toPersonelId,
-          coinAmount: transaction.coinAmount,
-          createdAt: transaction.createdAt,
-        },
+        _id: transaction._id,
+        fromPersonelId: transaction.fromPersonelId,
+        toPersonelId: transaction.toPersonelId,
+        coinAmount: transaction.coinAmount,
+        createdAt: transaction.createdAt,
       });
     } catch (error) {
       return Utils.errorResponse(res, 500, error);
     }
   }
+};
+
+exports.transactionGetAllByFromPersonelId = (req, res, next) => {
+  const id = req.params.id;
+  Transaction.find({ fromPersonelId: id })
+    .select('_id fromPersonelId toPersonelId coinAmount createdAt')
+    .exec()
+    .then((docs) => {
+      Utils.successResponse(res, 200, docs);
+    })
+    .catch((err) => {
+      Utils.errorResponse(res, 500, err);
+    });
+};
+
+exports.transactionGetAllByToPersonelId = (req, res, next) => {
+  const id = req.params.id;
+  Transaction.find({ toPersonelId: id })
+    .select('_id fromPersonelId toPersonelId coinAmount createdAt')
+    .exec()
+    .then((docs) => {
+      Utils.successResponse(res, 200, docs);
+    })
+    .catch((err) => {
+      Utils.errorResponse(res, 500, err);
+    });
 };
