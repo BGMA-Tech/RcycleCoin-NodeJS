@@ -41,7 +41,7 @@ exports.userRegister = (req, res, next) => {
           lastname: req.body.lastname,
           createdAt: Date.now(),
           role: PERSONEL_ROLE,
-          image: 'default_path', //`${basePath}/${req.file.path}`,
+          image: `${basePath}/${req.file.path}`,
         });
 
         const user = new User({

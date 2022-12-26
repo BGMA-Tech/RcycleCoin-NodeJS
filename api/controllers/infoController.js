@@ -27,7 +27,7 @@ exports.infoCreate = (req, res, next) => {
     firstname: req.body.firstname,
     lastname: req.body.lastname,
     role: req.body.role,
-    image: /*basePath + req.file.path*/ 'default_path',
+    image: basePath + req.file.path,
   });
   info
     .save()
