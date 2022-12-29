@@ -1,20 +1,20 @@
-const mongoose = require('mongoose');
-const bcrypt = require('bcrypt');
-const jwt = require('jsonwebtoken');
+const mongoose = require("mongoose");
+const bcrypt = require("bcrypt");
+const jwt = require("jsonwebtoken");
 
-const Utils = require('../utils/response');
-const hashUtil = require('../utils/hash/hashUtil');
-const GetVerifyId = require('../grpc/grpcClient');
-const User = require('../models/user');
-const Coin = require('../models/coin');
-const Info = require('../models/info');
+const Utils = require("../utils/response");
+const hashUtil = require("../utils/hash/hashUtil");
+const GetVerifyId = require("../grpc/grpcClient");
+const User = require("../models/user");
+const Coin = require("../models/coin");
+const Info = require("../models/info");
 const {
   PERSONEL_ID,
   PERSONEL_ROLE,
   NAME_IDENTIFIER,
   ROLE,
   EMAIL,
-} = require('../utils/constants/.NETConstants');
+} = require("../utils/constants/.NETConstants");
 
 const basePath = `http://localhost:${process.env.PORT ?? 3000}`;
 
@@ -23,7 +23,7 @@ exports.userRegister = (req, res, next) => {
     .exec()
     .then((user) => {
       if (user.length >= 1) {
-        return Utils.errorResponse(res, 409, 'Mail exists');
+        return Utils.errorResponse(res, 409, "Mail exists");
       }
       bcrypt.hash(req.body.password, 10, async (err, hash) => {
         if (err) return Utils.errorResponse(res, 500, err);
@@ -41,7 +41,7 @@ exports.userRegister = (req, res, next) => {
           lastname: req.body.lastname,
           createdAt: Date.now(),
           role: PERSONEL_ROLE,
-          image: 'default_path', //`${basePath}/${req.file.path}`,
+          image: "default_path", //`${basePath}/${req.file.path}`,
         });
 
         const user = new User({
@@ -83,16 +83,16 @@ exports.userRegister = (req, res, next) => {
 
 exports.userLogin = (req, res, next) => {
   User.find({ email: req.body.email })
-    .populate('info')
-    .populate('coin')
+    .populate("info")
+    .populate("coin")
     .exec()
     .then((user) => {
       if (user.length < 1) {
-        return Utils.errorResponse(res, 401, 'Auth failed');
+        return Utils.errorResponse(res, 401, "Auth failed");
       }
       bcrypt.compare(req.body.password, user[0].password, (err, result) => {
         if (err) {
-          return Utils.errorResponse(res, 401, 'Auth failed');
+          return Utils.errorResponse(res, 401, "Auth failed");
         }
         if (result) {
           const tokenParameters = {};
@@ -102,10 +102,10 @@ exports.userLogin = (req, res, next) => {
           tokenParameters[ROLE] = user[0].info.role;
 
           const token = jwt.sign(tokenParameters, process.env.JWT_KEY, {
-            expiresIn: '1h',
+            expiresIn: "1h",
           });
           return Utils.successResponse(res, 200, {
-            message: 'Auth successful',
+            message: "Auth successful",
             token,
             user: {
               _id: user[0]._id,
@@ -127,7 +127,7 @@ exports.userLogin = (req, res, next) => {
             },
           });
         }
-        return Utils.errorResponse(res, 401, 'Auth failed');
+        return Utils.errorResponse(res, 401, "Auth failed");
       });
     })
     .catch((err) => {
@@ -138,15 +138,15 @@ exports.userLogin = (req, res, next) => {
 exports.getUserById = (req, res, next) => {
   const id = req.params.id;
   User.findOne({ _id: id })
-    .select('_id personelId email info coin')
-    .populate('info', '_id firstname lastname createdAt role image')
-    .populate('coin', '_id totalCoin personelId')
+    .select("_id personelId email info coin")
+    .populate("info", "_id firstname lastname createdAt role image")
+    .populate("coin", "_id totalCoin personelId")
     .exec()
     .then((user) => {
       if (user) {
         return Utils.successResponse(res, 200, user);
       }
-      return Utils.errorResponse(res, 404, 'User not found');
+      return Utils.errorResponse(res, 404, "User not found");
     })
     .catch((err) => {
       return Utils.errorResponse(res, 500, err);
