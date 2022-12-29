@@ -37,6 +37,10 @@ exports.transactionCreate = async (req, res, next) => {
   const fromCoin = await Coin.findOne({ personelId: req.body.fromPersonelId });
 
   const toCoin = await Coin.findOne({ personelId: req.body.toPersonelId });
+
+  if (fromCoin == null || toCoin == null) {
+    return Utils.errorResponse(res, 500, "Personel ID is wrong");
+  }
   const transaction = new Transaction({
     _id: new mongoose.Types.ObjectId(),
     fromPersonelId: req.body.fromPersonelId,
@@ -46,11 +50,8 @@ exports.transactionCreate = async (req, res, next) => {
   });
 
   if (fromCoin.totalCoin < transaction.coinAmount) {
-    console.log("X");
     return Utils.errorResponse(res, 500, "Not enough coin to transfer");
   } else {
-    console.log("Y");
-
     fromCoin.totalCoin -= transaction.coinAmount;
     toCoin.totalCoin += transaction.coinAmount;
 
@@ -58,8 +59,6 @@ exports.transactionCreate = async (req, res, next) => {
       await fromCoin.save();
       await toCoin.save();
       await transaction.save();
-
-      console.log("Z");
 
       return Utils.successResponse(res, 201, {
         _id: transaction._id,
